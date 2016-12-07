@@ -64,10 +64,11 @@ subscriptions model = Sub.none
 -- " PAMET "
 djole : String -> Int
 djole s =
-    String.split "," s
-    |> List.map (\s -> String.trim s |> String.toInt |> Result.withDefault 0)
-    |> List.foldl (+) 0 
-
+    s 
+    |> String.split ","
+    >> List.map (String.trim >> String.toInt >> Result.withDefault 0)
+    >> List.foldl (+) 0 
+    
 
 -- VIEW
 view : Model -> Html Msg
