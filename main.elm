@@ -1,6 +1,7 @@
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (on, onInput)
+import Html.Events exposing (on, onInput, onClick)
+import Random exposing (..)
 
 main =
     Html.program
@@ -15,28 +16,44 @@ main =
 type alias Model =
         { kveri : String
         , res : Int
+        , zbir : Int
+        , random : Int
         }
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model "" 0, Cmd.none )
+    ( Model "" 0 0 1, Cmd.none )
 
 
 -- UPDATE
 type Msg
         = Inputed String
+        | Saberi
+        | DajRandom
+        | NoviRandom Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( updateHelp msg model, Cmd.none )
+    case msg of
+        DajRandom ->
+            ( model, Random.generate NoviRandom (Random.int 1 6))
+        NoviRandom nr ->
+            ( { model | random = nr }, Cmd.none )
+        _ ->
+            ( updateHelp msg model, Cmd.none )
 
 
 updateHelp : Msg -> Model -> Model
-updateHelp msg ({kveri} as model) =
+updateHelp msg ({ kveri, res } as model) =
     case msg of
         Inputed s ->
-            Model s (djole kveri)
+            { model | kveri = s, res = djole s}
+        Saberi ->
+            { model | zbir = res + (djole kveri)}
+        _ -> model
+        
+        
 
 
 -- SUBSCRIPTIONS
@@ -60,6 +77,10 @@ view model =
             djole model.kveri |> toString
         txt2 =
             toString model.res
+        zbir =
+            toString model.zbir
+        random =
+            toString model.random
     in
         div []
         [
@@ -69,6 +90,14 @@ view model =
             ],
             p [] [
                 span [] [ text ("in update: " ++ txt2) ]
+            ],
+            div [] [
+                button [ onClick Saberi ] [ text "Saberi" ],
+                span [] [ text (" = " ++ zbir) ]
+            ],
+            div [] [
+                button [ onClick DajRandom ] [ text "Daj random" ],
+                span [] [ text (" = " ++ random) ]
             ]
 
          ]
