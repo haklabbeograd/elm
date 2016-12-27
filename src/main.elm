@@ -61,44 +61,55 @@ subscriptions : Model -> Sub Msg
 subscriptions model = Sub.none
 
 
+
+
 -- " PAMET "
 djole : String -> Int
-djole s =
-    s 
-    |> String.split ","
+djole =
+    String.split ","
     >> List.map (String.trim >> String.toInt >> Result.withDefault 0)
     >> List.foldl (+) 0 
-    
 
 -- VIEW
 view : Model -> Html Msg
 view model =
     let
-        txt =
+        post_update =
             djole model.kveri |> toString
-        txt2 =
+        in_update =
             toString model.res
         zbir =
             toString model.zbir
         random =
             toString model.random
+        randomInt =
+            model.random
+        equals smth =
+            " = " ++ smth
+
     in
         div []
         [
             input [ onInput Inputed ] [],
             p [] [
-                span [] [ text ("post update: " ++ txt) ]
+                span [] [ text ("post update: " ++ post_update) ]
             ],
             p [] [
-                span [] [ text ("in update: " ++ txt2) ]
+                span [] [ text ("in update: " ++ in_update) ]
             ],
             div [] [
                 button [ onClick Saberi ] [ text "Saberi" ],
-                span [] [ text (" = " ++ zbir) ]
+                span [] [ text ( equals zbir ) ]
             ],
             div [] [
                 button [ onClick DajRandom ] [ text "Daj random" ],
-                span [] [ text (" = " ++ random) ]
+                span [] [ text ( equals "" ) ],
+                span 
+                    [   class "popin"
+                    ,   style 
+                            [ ( "font-size", (toString (randomInt * 10)) ++ "px" ) ] 
+                    ] 
+                    [ text random  ]
             ]
 
          ]

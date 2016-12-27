@@ -1,0 +1,25 @@
+{
+  "name": "hklb-elm",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/main.elm",
+  "scripts": {
+    "test": "echo \"LOL TESTS!\" && exit 9000",
+    "start": "concurrently -k -p name -n \"host,elm,styl\" -c \"grey,cyan,magenta\" \"npm run serve\" \"npm run watch-elm\" \"npm run watch-styl\"",
+    "serve": "http-server dist/",
+    "watch-elm": "chokidar \"**/*.elm\" -c \"elm make src/Main.elm --output dist/elm.js\" --initial",
+    "watch-styl": "stylus -w src/stil.styl -o dist/stil.css"
+  },
+  "keywords": [
+    "elm"
+  ],
+  "author": "MK",
+  "license": "ISC",
+  "devDependencies": {
+    "chokidar-cli": "^1.2.0",
+    "concurrently": "^3.1.0",
+    "elm": "^0.18.0",
+    "http-server": "^0.9.0",
+    "stylus": "^0.54.5"
+  }
+}
