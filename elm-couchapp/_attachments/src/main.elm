@@ -2,6 +2,27 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, onInput, onClick)
 import Random exposing (..)
+import Http
+import Json.Decode as Decode
+
+
+type alias DbMeta =
+    { version : String
+    , couchdb : String
+    , pogresna : Maybe String
+    }
+
+
+decodeDbMeta: Decode.Decoder DbMeta
+decodeDbMeta =
+    Decode.map3 DbMeta
+    (Decode.field "version" Decode.string)
+    (Decode.field "couchdb" Decode.string)
+    (Decode.maybe (Decode.field "pogresna" Decode.string))
+
+getVersion : Http.Request DbMeta
+getVersion =
+      Http.get "http://localhost:5984/" decodeDbMeta
 
 main =
     Html.program
@@ -16,22 +37,27 @@ main =
 type alias Model =
         { kveri : String
         , res : Int
-        , zbir : Int
+        , zbir : String
         , random : Int
         }
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model "" 0 0 1, Cmd.none )
+    ( Model "" 0 "" 1, Cmd.none )
 
 
 -- UPDATE
 type Msg
         = Inputed String
-        | Saberi
+        | Procitaj
+        | Osvezi (Result Http.Error DbMeta)
         | DajRandom
         | NoviRandom Int
 
+
+send: Cmd Msg
+send =
+    Http.send Osvezi getVersion
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -40,6 +66,12 @@ update msg model =
             ( model, Random.generate NoviRandom (Random.int 1 6))
         NoviRandom nr ->
             ( { model | random = nr }, Cmd.none )
+        Procitaj ->
+            ( model, send )
+        Osvezi ( Ok msg ) ->
+            ( { model | zbir = msg.version ++ " " ++ msg.couchdb ++ " " ++ Maybe.withDefault "AAA" msg.pogresna }, Cmd.none )
+        Osvezi ( Err e ) ->
+            ( { model | zbir = toString e }, Cmd.none )
         _ ->
             ( updateHelp msg model, Cmd.none )
 
@@ -49,8 +81,6 @@ updateHelp msg ({ kveri, res } as model) =
     case msg of
         Inputed s ->
             { model | kveri = s, res = djole s}
-        Saberi ->
-            { model | zbir = res + (djole kveri)}
         _ -> model
 
 
@@ -79,7 +109,7 @@ view model =
         in_update =
             toString model.res
         zbir =
-            toString model.zbir
+            model.zbir
         random =
             toString model.random
         randomInt =
@@ -98,7 +128,7 @@ view model =
                 span [] [ text ("in update: " ++ in_update) ]
             ],
             div [] [
-                button [ onClick Saberi ] [ text "Saberi" ],
+                button [ onClick Procitaj ] [ text "Procitaj verziju" ],
                 span [] [ text ( equals zbir ) ]
             ],
             div [] [
