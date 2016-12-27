@@ -52,8 +52,8 @@ updateHelp msg ({ kveri, res } as model) =
         Saberi ->
             { model | zbir = res + (djole kveri)}
         _ -> model
-        
-        
+
+
 
 
 -- SUBSCRIPTIONS
@@ -68,7 +68,7 @@ djole : String -> Int
 djole =
     String.split ","
     >> List.map (String.trim >> String.toInt >> Result.withDefault 0)
-    >> List.foldl (+) 0 
+    >> List.foldl (+) 0
 
 -- VIEW
 view : Model -> Html Msg
@@ -104,11 +104,11 @@ view model =
             div [] [
                 button [ onClick DajRandom ] [ text "Daj random" ],
                 span [] [ text ( equals "" ) ],
-                span 
+                span
                     [   class "popin"
-                    ,   style 
-                            [ ( "font-size", (toString (randomInt * 10)) ++ "px" ) ] 
-                    ] 
+                    ,   style
+                            [ ( "font-size", (toString (randomInt * 10)) ++ "px" ) ]
+                    ]
                     [ text random  ]
             ]
 
