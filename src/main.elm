@@ -34,13 +34,14 @@ type Msg
         = Inputed String
         | Procitaj
         | Osvezi (Result Http.Error DB.DbMeta)
+        | UpisiAlbum (Result Http.Error ())
         | DajRandom
         | NoviRandom Int
 
 
 send: Cmd Msg
 send =
-    Http.send Osvezi DB.getVersion
+    Http.send UpisiAlbum DB.addAlbum
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -54,6 +55,10 @@ update msg model =
         Osvezi ( Ok msg ) ->
             ( { model | zbir = msg.version ++ " " ++ msg.couchdb ++ " " ++ Maybe.withDefault "AAA" msg.pogresna }, Cmd.none )
         Osvezi ( Err e ) ->
+            ( { model | zbir = toString e }, Cmd.none )
+        UpisiAlbum ( Ok () ) ->
+            ( { model | zbir = "Upisano" }, Cmd.none )
+        UpisiAlbum ( Err e ) ->
             ( { model | zbir = toString e }, Cmd.none )
         _ ->
             ( updateHelp msg model, Cmd.none )
@@ -111,7 +116,7 @@ view model =
                 span [] [ text ("in update: " ++ in_update) ]
             ],
             div [] [
-                button [ onClick Procitaj ] [ text "Procitaj verziju" ],
+                button [ onClick Procitaj ] [ text "Upisi album" ],
                 span [] [ text ( equals zbir ) ]
             ],
             div [] [
