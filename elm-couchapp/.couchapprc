@@ -1,7 +1,7 @@
 {
   "env": {
     "default": {
-      "db": "http://admin:admin@localhost:5984/ec"
+      "db": "http://localhost:5984/ec"
     }
   }
 }
