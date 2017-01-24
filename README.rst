@@ -1,4 +1,4 @@
-Postavljanje okruzenja
+Postavljanje okruženja
 ======================
 
 Instalirati elm, couchdb i couchapp.
