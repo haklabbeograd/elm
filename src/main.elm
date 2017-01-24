@@ -3,26 +3,9 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (on, onInput, onClick)
 import Random exposing (..)
 import Http
-import Json.Decode as Decode
 
+import DB as DB
 
-type alias DbMeta =
-    { version : String
-    , couchdb : String
-    , pogresna : Maybe String
-    }
-
-
-decodeDbMeta: Decode.Decoder DbMeta
-decodeDbMeta =
-    Decode.map3 DbMeta
-    (Decode.field "version" Decode.string)
-    (Decode.field "couchdb" Decode.string)
-    (Decode.maybe (Decode.field "pogresna" Decode.string))
-
-getVersion : Http.Request DbMeta
-getVersion =
-      Http.get "http://localhost:5984/" decodeDbMeta
 
 main =
     Html.program
@@ -50,14 +33,14 @@ init =
 type Msg
         = Inputed String
         | Procitaj
-        | Osvezi (Result Http.Error DbMeta)
+        | Osvezi (Result Http.Error DB.DbMeta)
         | DajRandom
         | NoviRandom Int
 
 
 send: Cmd Msg
 send =
-    Http.send Osvezi getVersion
+    Http.send Osvezi DB.getVersion
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
