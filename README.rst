@@ -9,3 +9,8 @@ Pokretanje aplikacije::
 
     npm install
     npm start
+
+Elm
+----------
+http://package.elm-lang.org/packages/elm-lang/core/latest/Json-Encode
+http://elm-lang.org/docs/records
