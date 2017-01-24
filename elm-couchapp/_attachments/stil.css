@@ -1,0 +1,46 @@
+.popin {
+  display: block;
+  background-color: #ff0;
+  animation: popin-kf 1s linear none;
+  transition: font 1s;
+}
+@-moz-keyframes popin-kf {
+  from {
+    font-size: 2rem;
+    color: #f00;
+  }
+  to {
+    font-size: 1rem;
+    color: #000;
+  }
+}
+@-webkit-keyframes popin-kf {
+  from {
+    font-size: 2rem;
+    color: #f00;
+  }
+  to {
+    font-size: 1rem;
+    color: #000;
+  }
+}
+@-o-keyframes popin-kf {
+  from {
+    font-size: 2rem;
+    color: #f00;
+  }
+  to {
+    font-size: 1rem;
+    color: #000;
+  }
+}
+@keyframes popin-kf {
+  from {
+    font-size: 2rem;
+    color: #f00;
+  }
+  to {
+    font-size: 1rem;
+    color: #000;
+  }
+}
