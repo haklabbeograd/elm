@@ -1,10 +1,11 @@
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (on, onInput, onClick)
+import Html.Events exposing (..)
 import Random exposing (..)
 import Http
 
 import DB as DB
+-- import Bttn exposing (..)
 
 
 main =
@@ -22,11 +23,12 @@ type alias Model =
         , res : Int
         , zbir : String
         , random : Int
+        , button : BttnModel
         }
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model "" 0 "" 1, Cmd.none )
+    ( Model "" 0 "" 1 (BttnModel "green"), Cmd.none )
 
 
 -- UPDATE
@@ -37,6 +39,7 @@ type Msg
         | UpisiAlbum (Result Http.Error ())
         | DajRandom
         | NoviRandom Int
+        | ButtonMsg BttnMsg
 
 
 send: Cmd Msg
@@ -60,6 +63,8 @@ update msg model =
             ( { model | zbir = "Upisano" }, Cmd.none )
         UpisiAlbum ( Err e ) ->
             ( { model | zbir = toString e }, Cmd.none )
+        ButtonMsg bttnmsg-> 
+            ( { model | button = (bttnUpdate bttnmsg model.button) } , Cmd.none )
         _ ->
             ( updateHelp msg model, Cmd.none )
 
@@ -96,7 +101,7 @@ view model =
             djole model.kveri |> toString
         in_update =
             toString model.res
-        zbir =
+        zbir =  
             model.zbir
         random =
             toString model.random
@@ -129,5 +134,44 @@ view model =
                     ]
                     [ text random  ]
             ]
+            , (bttnView model.button)
 
          ]
+
+
+
+
+
+type alias BttnModel = { color : String }
+
+
+-- model: String -> BttnModel
+-- model s = 
+type BttnMsg 
+    = MouseIn
+    | MouseOut
+
+-- update: Msg -> BttnModel -> BttnModel
+bttnUpdate bm model = 
+    case bm of
+        MouseIn -> { model | color = "red" }
+        MouseOut -> { model | color = "green" }
+        -- _ -> model
+
+bttnView: BttnModel -> Html Msg
+bttnView model =
+    let
+        color = model.color
+    in
+        div [] [
+            div 
+                [   class "button"
+                ,   style [ ("background-color", color) ]
+                ,   onMouseEnter (ButtonMsg MouseIn)
+                ,   onMouseLeave (ButtonMsg MouseOut) 
+                ]   
+                [
+                    text "AAAAa"
+                ]
+
+        ]
