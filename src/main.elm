@@ -7,6 +7,7 @@ import Http
 import DB as DB
 
 
+main: Platform.Program Never Model Msg 
 main =
     Html.program
         { init = init
@@ -18,22 +19,23 @@ main =
 
 -- MODEL
 type alias Model =
-        { kveri : String
-        , res : Int
-        , zbir : String
-        , random : Int
-        }
+    { kveri: String
+    , res: Int
+    , zbir: String
+    , random: Int
+    , dbInfo: DB.DbInfo
+    }
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model "" 0 "" 1, Cmd.none )
+    ( Model "" 0 "" 1 DB.initialDbInfo, Cmd.none )
 
 
 -- UPDATE
 type Msg
         = Inputed String
         | Procitaj
-        | Osvezi (Result Http.Error DB.DbMeta)
+        | Osvezi (Result Http.Error DB.DbInfo)
         | UpisiAlbum (Result Http.Error ())
         | DajRandom
         | NoviRandom Int
@@ -41,7 +43,7 @@ type Msg
 
 send: Cmd Msg
 send =
-    Http.send UpisiAlbum DB.addAlbum
+    Http.send Osvezi DB.getDbInfo
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -53,7 +55,7 @@ update msg model =
         Procitaj ->
             ( model, send )
         Osvezi ( Ok msg ) ->
-            ( { model | zbir = msg.version ++ " " ++ msg.couchdb ++ " " ++ Maybe.withDefault "AAA" msg.pogresna }, Cmd.none )
+            ( { model | zbir = toString msg }, Cmd.none )
         Osvezi ( Err e ) ->
             ( { model | zbir = toString e }, Cmd.none )
         UpisiAlbum ( Ok () ) ->
@@ -116,7 +118,7 @@ view model =
                 span [] [ text ("in update: " ++ in_update) ]
             ],
             div [] [
-                button [ onClick Procitaj ] [ text "Upisi album" ],
+                button [ onClick Procitaj ] [ text "Isprintaj info" ],
                 span [] [ text ( equals zbir ) ]
             ],
             div [] [
