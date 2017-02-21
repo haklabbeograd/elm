@@ -19,6 +19,7 @@ main =
 type alias Model =
     { dugmici : List Dugme
     , naziv : Maybe String
+    , formica : Forma.Model
     }
 
 
@@ -29,6 +30,7 @@ init =
             , Dugme.init Color.green Color.red "Klasik"
             ]
       , naziv = Nothing
+      , formica = Forma.init 0
       }
     , Cmd.none
     )
@@ -76,7 +78,23 @@ update msg model =
                 { model | dugmici = ndugmici, naziv = noviNaziv } ! []
 
         NasaForma fmsg ->
-            model ! []
+            let
+                ( nf, cmd ) =
+                    Forma.update fmsg model.formica
+
+                dugmici =
+                    case fmsg of
+                        Forma.Submit (Just { p, d, t }) ->
+                            let
+                                nd =
+                                    Dugme.init p d t
+                            in
+                                nd :: model.dugmici
+
+                        _ ->
+                            model.dugmici
+            in
+                { model | formica = nf, dugmici = dugmici } ! [ Cmd.map NasaForma cmd ]
 
 
 subscriptions : Model -> Sub Msg
@@ -99,7 +117,8 @@ view model =
             naziv :: (dugmici model.dugmici)
 
         desno =
-            Html.map NasaForma Forma.view
+            Forma.view model.formica
+                |> Html.map NasaForma
     in
         Html.div []
             [ Html.div [] levo
