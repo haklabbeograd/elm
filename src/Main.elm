@@ -4,6 +4,7 @@ import Html exposing (Html)
 import Dugme exposing (Dugme)
 import Color
 import Forma
+import Klok
 
 
 main : Program Never Model Msg
@@ -20,6 +21,7 @@ type alias Model =
     { dugmici : List Dugme
     , naziv : Maybe String
     , formica : Forma.Model
+    , klok: Klok.Klok
     }
 
 
@@ -31,6 +33,7 @@ init =
             ]
       , naziv = Nothing
       , formica = Forma.init 0
+      , klok = Klok.init 0
       }
     , Cmd.none
     )
@@ -40,6 +43,7 @@ type Msg
     = AMsg
     | Dugmici Int Dugme.Msg
     | NasaForma Forma.Msg
+    | Klok Klok.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -95,6 +99,8 @@ update msg model =
                             model.dugmici
             in
                 { model | formica = nf, dugmici = dugmici } ! [ Cmd.map NasaForma cmd ]
+        Klok kmsg ->
+            { model | klok = Klok.update kmsg model.klok } ! []
 
 
 subscriptions : Model -> Sub Msg
@@ -123,6 +129,7 @@ view model =
         Html.div []
             [ Html.div [] levo
             , desno
+            , Klok.view model.klok |> Html.map Klok
             ]
 
 
