@@ -5,6 +5,7 @@ import Dugme exposing (Dugme)
 import Color
 import Forma
 import Klok
+import Klokotalo
 
 
 main : Program Never Model Msg
@@ -22,6 +23,7 @@ type alias Model =
     , naziv : Maybe String
     , formica : Forma.Model
     , klok: Klok.Klok
+    , klokotalo: Klokotalo.Model
     }
 
 
@@ -33,7 +35,8 @@ init =
             ]
       , naziv = Nothing
       , formica = Forma.init 0
-      , klok = Klok.init 0
+      , klok = Klok.init 0 0
+      , klokotalo = Klokotalo.init
       }
     , Cmd.none
     )
@@ -44,6 +47,7 @@ type Msg
     | Dugmici Int Dugme.Msg
     | NasaForma Forma.Msg
     | Klok Klok.Msg
+    | Klokotalo Klokotalo.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -101,6 +105,8 @@ update msg model =
                 { model | formica = nf, dugmici = dugmici } ! [ Cmd.map NasaForma cmd ]
         Klok kmsg ->
             { model | klok = Klok.update kmsg model.klok } ! []
+        Klokotalo kt ->
+            { model | klokotalo = Klokotalo.update kt model.klokotalo } ! []
 
 
 subscriptions : Model -> Sub Msg
@@ -130,6 +136,7 @@ view model =
             [ Html.div [] levo
             , desno
             , Klok.view model.klok |> Html.map Klok
+            , Klokotalo.view model.klokotalo |> Html.map Klokotalo
             ]
 
 
