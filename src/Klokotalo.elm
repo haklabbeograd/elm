@@ -2,6 +2,7 @@ module Klokotalo exposing (..)
 
 import Html exposing (..)
 import Html.Events exposing (on, onInput, onClick)
+import Debug exposing (..)
 
 import Klok
 
@@ -15,6 +16,7 @@ type alias Model =
 type Operacija
     = Sabiranje
     | Mnozenje
+    | Oduzimanje
 
 type Msg
     = Racunaj
@@ -48,6 +50,18 @@ update msg model =
                             >> List.foldl (*) 1 )
                             <| model.klokovi )
                     }
+                Oduzimanje -> 
+                    let
+                      vals = List.map (\ k -> k.i ) model.klokovi
+                      first = List.head vals |> Maybe.withDefault 0
+                      rest = List.tail vals |> Maybe.withDefault []
+
+
+                    --   log "first" first
+                    --   log "rest" rest
+                    in
+                        { model | rezultat = Just ( List.foldl (\ r f -> (log "f" f) - (log "r" r)) (log "first" first) (log "rest" rest) )
+                        }
         DodajKlok ->
             { model | klokovi = Klok.init 0 (List.length model.klokovi) :: model.klokovi 
             }
@@ -74,7 +88,10 @@ view model =
         Sabiranje ->
           Mnozenje
         Mnozenje ->
-          Sabiranje
+          Oduzimanje
+        Oduzimanje ->
+            Sabiranje
+        
     in
       div [] 
         [ button [ onClick DodajKlok ] [ text "dodaj klok" ]

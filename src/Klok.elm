@@ -35,4 +35,5 @@ view m =
     [ button [ onClick ( Dole m.id ) ] [ text "Dole" ]
     , text (toString m.i)
     , button [ onClick ( Gore m.id ) ] [ text "Gore" ]
+    , text (" - " ++ m.id)
     ]
