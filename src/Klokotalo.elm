@@ -10,13 +10,14 @@ import Klok
 type alias Model =
     { klokovi: List Klok.Klok
     , operacija: Operacija
-    , rezultat: Maybe Int
+    , rezultat: Maybe Float
     }
 
 type Operacija
     = Sabiranje
     | Mnozenje
     | Oduzimanje
+    | Deljenje
 
 type Msg
     = Racunaj
@@ -26,8 +27,8 @@ type Msg
 
 
 init: Model
-init = 
-    { klokovi = [ Klok.init 0 0, Klok.init 0 1, Klok.init 0 2 ] 
+init =
+    { klokovi = [ Klok.init 0 2, Klok.init 0 1, Klok.init 0 0 ]
     , operacija = Sabiranje
     , rezultat = Nothing
     }
@@ -36,21 +37,21 @@ init =
 update: Msg -> Model -> Model
 update msg model =
     case msg of
-        PostaviOperaciju op -> 
+        PostaviOperaciju op ->
             { model | operacija = op }
         Racunaj ->
             case model.operacija of
                 Sabiranje ->
                     { model | rezultat = Just ( List.foldl (+) 0
-                        ( List.map (\ k -> k.i ) model.klokovi ) )
+                        ( List.map (\ k -> toFloat k.i ) model.klokovi ) )
                     }
-                Mnozenje -> 
+                Mnozenje ->
                     { model | rezultat = Just (
-                            ( List.map (\ k -> k.i )
+                            (  List.map (\ k -> toFloat k.i )
                             >> List.foldl (*) 1 )
                             <| model.klokovi )
                     }
-                Oduzimanje -> 
+                Oduzimanje ->
                     let
                       vals = List.map (\ k -> k.i ) model.klokovi
                       first = List.head vals |> Maybe.withDefault 0
@@ -60,10 +61,15 @@ update msg model =
                     --   log "first" first
                     --   log "rest" rest
                     in
-                        { model | rezultat = Just ( List.foldl (\ r f -> (log "f" f) - (log "r" r)) (log "first" first) (log "rest" rest) )
+                        { model | rezultat = Just (toFloat ( List.foldl (\ r f -> (log "f" f) - (log "r" r)) (log "first" first) (log "rest" rest) ) )
                         }
+                Deljenje ->
+                        case model.klokovi of
+                            []   -> { model | rezultat = Just ( 1.0 ) }
+                            h::t -> { model | rezultat = Just (
+                                                List.foldl (\ x y -> y / x) ( toFloat h.i ) (List.map (\ k -> toFloat k.i ) t ) ) }
         DodajKlok ->
-            { model | klokovi = Klok.init 0 (List.length model.klokovi) :: model.klokovi 
+            { model | klokovi = Klok.init 0 (List.length model.klokovi) :: model.klokovi
             }
         Klik id klik ->
             let
@@ -90,14 +96,15 @@ view model =
         Mnozenje ->
           Oduzimanje
         Oduzimanje ->
-            Sabiranje
-        
+          Deljenje
+        Deljenje ->
+          Sabiranje
     in
-      div [] 
+      div []
         [ button [ onClick DodajKlok ] [ text "dodaj klok" ]
         , div [] ( crtajKlokove ks )
-        , button 
-            [ onClick (PostaviOperaciju novaop) ] 
+        , button
+            [ onClick (PostaviOperaciju novaop) ]
             [ text ("promeni u " ++ (novaop |> toString)) ]
         , div [] [ text (operacija |> toString) ]
         , button [ onClick Racunaj ] [ text "racunaj" ]

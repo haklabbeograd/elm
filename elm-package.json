@@ -1,7 +1,7 @@
 {
     "version": "0.0.8",
-    "summary": "A starter project for elm apps using webpack",
-    "repository": "https://github.com/benansell/elm-webpack-seed.git",
+    "summary": "A fundamental project for elm apps using webpack",
+    "repository": "https://github.com/haklabbeograd/elm.git",
     "license": "BSD-3-Clause",
     "source-directories": [
         "src"

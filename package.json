@@ -1,15 +1,15 @@
 {
-  "name": "elm-webpack-seed",
+  "name": "funkcionalni-fundamentalisti",
   "version": "0.0.8",
-  "description": "A starter project for elm apps using webpack",
+  "description": "A fundamental project for elm apps using webpack",
   "keywords": [
     "elm",
     "webpack"
   ],
-  "author": "bja <code@benansell.com>",
+  "author": "haklab@googlegroups.com",
   "repository": {
     "type": "git",
-    "url": "git@github.com:benansell/elm-webpack-seed.git"
+    "url": "git@github.com:haklabbeograd/elm.git"
   },
   "license": "BSD-3-Clause",
   "main": "index.html",
