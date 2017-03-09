@@ -1,16 +1,20 @@
 module Main exposing (main)
 
 import Html exposing (Html)
+import Html.Attributes exposing (href)
 import Dugme exposing (Dugme)
 import Color
 import Forma
 import Klok
 import Klokotalo
+import Navigation
+import Model exposing (Model)
+import Routing exposing (Route(..))
 
 
 main : Program Never Model Msg
 main =
-    Html.program
+    Navigation.program UrlUpdate
         { init = init
         , view = view
         , update = update
@@ -18,28 +22,24 @@ main =
         }
 
 
-type alias Model =
-    { dugmici : List Dugme
-    , naziv : Maybe String
-    , formica : Forma.Model
-    , klok: Klok.Klok
-    , klokotalo: Klokotalo.Model
-    }
-
-
-init : ( Model, Cmd Msg )
-init =
-    ( { dugmici =
-            [ Dugme.init Color.darkGray Color.orange "Kara"
-            , Dugme.init Color.green Color.red "Klasik"
-            ]
-      , naziv = Nothing
-      , formica = Forma.init 0
-      , klok = Klok.init 0 0
-      , klokotalo = Klokotalo.init
-      }
-    , Cmd.none
-    )
+init : Navigation.Location -> ( Model, Cmd Msg )
+init location =
+    let
+        route =
+            Routing.routeLocation location
+    in
+        ( { dugmici =
+                [ Dugme.init Color.darkGray Color.orange "Kara"
+                , Dugme.init Color.green Color.red "Klasik"
+                ]
+          , naziv = Nothing
+          , formica = Forma.init 0
+          , klok = Klok.init 0 0
+          , klokotalo = Klokotalo.init
+          , route = route
+          }
+        , Cmd.none
+        )
 
 
 type Msg
@@ -48,11 +48,27 @@ type Msg
     | NasaForma Forma.Msg
     | Klok Klok.Msg
     | Klokotalo Klokotalo.Msg
+    | UrlUpdate Navigation.Location
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        UrlUpdate location ->
+            let
+                route =
+                    Routing.routeLocation location
+
+                cmd =
+                    case route of
+                        Prva ->
+                            Navigation.newUrl "#druga/666"
+
+                        Druga _ ->
+                            Cmd.none
+            in
+                { model | route = route } ! [ cmd ]
+
         AMsg ->
             model ! []
 
@@ -103,8 +119,10 @@ update msg model =
                             model.dugmici
             in
                 { model | formica = nf, dugmici = dugmici } ! [ Cmd.map NasaForma cmd ]
+
         Klok kmsg ->
             { model | klok = Klok.update kmsg model.klok } ! []
+
         Klokotalo kt ->
             { model | klokotalo = Klokotalo.update kt model.klokotalo } ! []
 
@@ -131,13 +149,21 @@ view model =
         desno =
             Forma.view model.formica
                 |> Html.map NasaForma
+
+        stabre =
+            case model.route of
+                Prva ->
+                    levo ++ [ desno ]
+
+                Druga i ->
+                    [ Html.h1 [] [ Html.text <| toString i ]
+                    , Klok.view model.klok |> Html.map Klok
+                    , Klokotalo.view model.klokotalo |> Html.map Klokotalo
+                    , Html.a [ href ("#druga/" ++ (toString (i + 72))) ] [ Html.text "NEXT!" ]
+                    ]
     in
         Html.div []
-            [ Html.div [] levo
-            , desno
-            , Klok.view model.klok |> Html.map Klok
-            , Klokotalo.view model.klokotalo |> Html.map Klokotalo
-            ]
+            stabre
 
 
 dugmici : List Dugme -> List (Html Msg)
