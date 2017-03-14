@@ -5,6 +5,7 @@ import Forma
 import Klok
 import Klokotalo
 import Routing exposing (Route)
+import GejmOfLajf
 
 
 type alias Model =
@@ -14,4 +15,6 @@ type alias Model =
     , klok : Klok.Klok
     , klokotalo : Klokotalo.Model
     , route : Route
+    , clock : Float
+    , gol : GejmOfLajf.Model
     }

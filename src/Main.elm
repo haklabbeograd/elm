@@ -2,6 +2,8 @@ module Main exposing (main)
 
 import Html exposing (Html)
 import Html.Attributes exposing (href)
+import AnimationFrame
+import Time exposing (Time)
 import Dugme exposing (Dugme)
 import Color
 import Forma
@@ -10,6 +12,7 @@ import Klokotalo
 import Navigation
 import Model exposing (Model)
 import Routing exposing (Route(..))
+import GejmOfLajf
 
 
 main : Program Never Model Msg
@@ -37,6 +40,8 @@ init location =
           , klok = Klok.init 0 0
           , klokotalo = Klokotalo.init
           , route = route
+          , clock = 0
+          , gol = GejmOfLajf.init
           }
         , Cmd.none
         )
@@ -49,6 +54,7 @@ type Msg
     | Klok Klok.Msg
     | Klokotalo Klokotalo.Msg
     | UrlUpdate Navigation.Location
+    | Animate Time
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -64,7 +70,7 @@ update msg model =
                         Prva ->
                             Navigation.newUrl "#druga/666"
 
-                        Druga _ ->
+                        _ ->
                             Cmd.none
             in
                 { model | route = route } ! [ cmd ]
@@ -126,10 +132,13 @@ update msg model =
         Klokotalo kt ->
             { model | klokotalo = Klokotalo.update kt model.klokotalo } ! []
 
+        Animate diff ->
+            { model | clock = diff + model.clock } ! []
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    Sub.batch [ AnimationFrame.diffs Animate ]
 
 
 view : Model -> Html Msg
@@ -161,9 +170,14 @@ view model =
                     , Klokotalo.view model.klokotalo |> Html.map Klokotalo
                     , Html.a [ href ("#druga/" ++ (toString (i + 72))) ] [ Html.text "NEXT!" ]
                     ]
+
+                GOL ->
+                    []
     in
         Html.div []
-            stabre
+            [ Html.h3 [] [ Html.text (model.clock |> toString) ]
+            , Html.div [] stabre
+            ]
 
 
 dugmici : List Dugme -> List (Html Msg)

@@ -7,6 +7,7 @@ import Navigation
 type Route
     = Prva
     | Druga Int
+    | GOL
 
 
 routeLocation : Navigation.Location -> Route
