@@ -4,6 +4,7 @@ import Html exposing (Html)
 import Html.Attributes exposing (href)
 import AnimationFrame
 import Time exposing (Time)
+import Random exposing (pair, list, int, generate, Generator)
 import Dugme exposing (Dugme)
 import Color
 import Forma
@@ -41,9 +42,11 @@ init location =
           , klokotalo = Klokotalo.init
           , route = route
           , clock = 0
-          , gol = GejmOfLajf.init
+          , gol =
+                GejmOfLajf.init
+                    []
           }
-        , Cmd.none
+        , generate RandomGen randomBrojevi
         )
 
 
@@ -55,6 +58,12 @@ type Msg
     | Klokotalo Klokotalo.Msg
     | UrlUpdate Navigation.Location
     | Animate Time
+    | RandomGen (List ( Int, Int ))
+
+
+randomBrojevi : Generator (List ( Int, Int ))
+randomBrojevi =
+    list ((toFloat GejmOfLajf.boardSize ^ 2 / 1.5) |> floor) <| pair (int 0 GejmOfLajf.boardSize) (int 0 GejmOfLajf.boardSize)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -133,7 +142,17 @@ update msg model =
             { model | klokotalo = Klokotalo.update kt model.klokotalo } ! []
 
         Animate diff ->
-            { model | clock = diff + model.clock } ! []
+            { model
+                | clock = diff + model.clock
+                , gol = GejmOfLajf.update diff model.gol
+            }
+                ! []
+
+        RandomGen zivi ->
+            { model
+                | gol = GejmOfLajf.init zivi
+            }
+                ! []
 
 
 subscriptions : Model -> Sub Msg
@@ -172,7 +191,7 @@ view model =
                     ]
 
                 GOL ->
-                    []
+                    [ GejmOfLajf.view model.gol ]
     in
         Html.div []
             [ Html.h3 [] [ Html.text (model.clock |> toString) ]
