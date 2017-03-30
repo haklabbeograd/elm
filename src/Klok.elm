@@ -7,7 +7,7 @@ import Util exposing (..)
 
 
 
-type alias Klok = 
+type alias Klok =
   { id: String
   , i: Int
   }

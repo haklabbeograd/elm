@@ -6,8 +6,11 @@ import Debug exposing (..)
 import Klok
 
 
+type alias Klokovi = List Klok.Klok
+
+
 type alias Model =
-    { klokovi : List Klok.Klok
+    { klokovi : Klokovi
     , operacija : Operacija
     , rezultat : Maybe Float
     }

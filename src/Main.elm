@@ -14,6 +14,7 @@ import Navigation
 import Model exposing (Model)
 import Routing exposing (Route(..))
 import GejmOfLajf
+import Gql exposing (..)
 
 
 main : Program Never Model Msg
@@ -47,6 +48,7 @@ init location =
                     []
           }
         , generate RandomGen randomBrojevi
+        , uzmiKlokotalo RandomGen randomBrojevi
         )
 
 
