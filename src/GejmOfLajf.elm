@@ -74,8 +74,8 @@ survival komsije celija =
         celija
     else if komsije == 3 then
         Ziva
-    else if komsije == 4 then
-        Ziva
+        -- else if komsije == 4 then
+        --     Ziva
     else
         Mrtva
 

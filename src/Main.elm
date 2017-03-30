@@ -59,6 +59,7 @@ type Msg
     | UrlUpdate Navigation.Location
     | Animate Time
     | RandomGen (List ( Int, Int ))
+    | PrvoKlokotalo
 
 
 randomBrojevi : Generator (List ( Int, Int ))
@@ -154,6 +155,9 @@ update msg model =
             }
                 ! []
 
+        PrvoKlokotalo ->
+            model ! []
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
@@ -192,6 +196,9 @@ view model =
 
                 GOL ->
                     [ GejmOfLajf.view model.gol ]
+
+                GQL ->
+                    []
     in
         Html.div []
             [ Html.h3 [] [ Html.text (model.clock |> toString) ]

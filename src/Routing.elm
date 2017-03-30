@@ -8,6 +8,7 @@ type Route
     = Prva
     | Druga Int
     | GOL
+    | GQL
 
 
 routeLocation : Navigation.Location -> Route
@@ -28,7 +29,7 @@ routeFromResult =
 matchers : Parser (Route -> a) a
 matchers =
     oneOf
-        [ map GOL top
+        [ map Prva top
         , map Prva (s "prva")
         , map Druga (s "druga" </> int)
         , map (Druga 0) (s "druga")
