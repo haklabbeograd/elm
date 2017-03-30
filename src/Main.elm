@@ -48,12 +48,15 @@ init location =
                     []
           }
         , generate RandomGen randomBrojevi
-        , uzmiKlokotalo RandomGen randomBrojevi
+        , uzmiKlokotaloRq PrvoKlokotalo Klokotalo.Klokovi
         )
 
+callAll =
+    
 
 type Msg
     = AMsg
+    | Init
     | Dugmici Int Dugme.Msg
     | NasaForma Forma.Msg
     | Klok Klok.Msg
@@ -61,7 +64,7 @@ type Msg
     | UrlUpdate Navigation.Location
     | Animate Time
     | RandomGen (List ( Int, Int ))
-    | PrvoKlokotalo
+    | PrvoKlokotalo (Gql.Msg Klokotalo.Klokovi)
 
 
 randomBrojevi : Generator (List ( Int, Int ))
@@ -72,6 +75,8 @@ randomBrojevi =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        PrvoKlokotalo klokovi -> 
+            { model | klokovi = klokovi} ! []
         UrlUpdate location ->
             let
                 route =
@@ -157,8 +162,7 @@ update msg model =
             }
                 ! []
 
-        PrvoKlokotalo ->
-            model ! []
+
 
 
 subscriptions : Model -> Sub Msg

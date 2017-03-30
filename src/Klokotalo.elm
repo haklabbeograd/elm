@@ -6,8 +6,9 @@ import Debug exposing (..)
 import Klok
 
 
-type alias Klokovi = List Klok.Klok
-
+type alias Klokovi = 
+    { lista: List Klok.Klok
+    }
 
 type alias Model =
     { klokovi : Klokovi
@@ -32,7 +33,7 @@ type Msg
 
 init : Model
 init =
-    { klokovi = [ Klok.init 0 2, Klok.init 0 1, Klok.init 0 0 ]
+    { klokovi = { lista = [ Klok.init 0 2, Klok.init 0 1, Klok.init 0 0 ] }
     , operacija = Sabiranje
     , rezultat = Nothing
     }
@@ -52,7 +53,7 @@ update msg model =
                             Just
                                 (List.foldl (+)
                                     0
-                                    (List.map (\k -> toFloat k.i) model.klokovi)
+                                    (List.map (\k -> toFloat k.i) model.klokovi.lista)
                                 )
                     }
 
@@ -64,14 +65,14 @@ update msg model =
                                     >> List.foldl (*) 1
                                  )
                                  <|
-                                    model.klokovi
+                                    model.klokovi.lista
                                 )
                     }
 
                 Oduzimanje ->
                     let
                         vals =
-                            List.map (\k -> k.i) model.klokovi
+                            List.map (\k -> k.i) model.klokovi.lista
 
                         first =
                             List.head vals |> Maybe.withDefault 0
@@ -87,7 +88,7 @@ update msg model =
                         }
 
                 Deljenje ->
-                    case model.klokovi of
+                    case model.klokovi.lista of
                         [] ->
                             { model | rezultat = Just (1.0) }
 
@@ -100,13 +101,13 @@ update msg model =
 
         DodajKlok ->
             { model
-                | klokovi = Klok.init 0 (List.length model.klokovi) :: model.klokovi
+                | klokovi = { lista = Klok.init 0 (List.length model.klokovi.lista) :: model.klokovi.lista }
             }
 
         Klik id klik ->
             let
                 k =
-                    model.klokovi
+                    model.klokovi.lista
                         |> List.map
                             (\k ->
                                 if k.id == id then
@@ -115,7 +116,7 @@ update msg model =
                                     k
                             )
             in
-                { model | klokovi = k }
+                { model | klokovi = { lista = k }}
 
 
 view : Model -> Html Msg
@@ -156,6 +157,6 @@ view model =
             ]
 
 
-crtajKlokove : List Klok.Klok -> List (Html Msg)
-crtajKlokove =
-    List.map (\k -> Html.map (Klik k.id) (Klok.view k))
+crtajKlokove : Klokovi -> List (Html Msg)
+crtajKlokove klokovi =
+    List.map (\k -> Html.map (Klik k.id) (Klok.view k)) klokovi.lista
