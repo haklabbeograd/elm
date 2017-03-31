@@ -10,7 +10,7 @@ import Array
 
 boardSize : Int
 boardSize =
-    100
+    85
 
 
 type Celija

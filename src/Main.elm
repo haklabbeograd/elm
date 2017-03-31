@@ -6,7 +6,6 @@ import AnimationFrame
 import Time exposing (Time)
 import Random exposing (pair, list, int, generate, Generator)
 import Dugme exposing (Dugme)
-import Http
 import Color
 import Forma
 import Klok
@@ -28,7 +27,7 @@ main =
         }
 
 
-init : Navigation.Location -> ( Model, Cmd Msg )
+init : Navigation.Location -> ( Model, Cmd Msg)
 init location =
     let
         route =
@@ -48,8 +47,9 @@ init location =
                 GejmOfLajf.init
                     []
           }
-        --, generate RandomGen randomBrojevi
-        , Cmd.map (\_ -> AMsg) uzmiKlokotaloRq
+        -- , generate RandomGen randomBrojevi 
+          , Cmd.map (\a -> PrvoKlokotalo a) uzmiKlokotaloRq
+            -- , Cmd.none
         )
 
 
@@ -62,7 +62,7 @@ type Msg
     | UrlUpdate Navigation.Location
     | Animate Time
     | RandomGen (List ( Int, Int ))
-    | PrvoKlokotalo (Result Http.Error Klokotalo.Klokovi)
+    | PrvoKlokotalo Gql.Msg --(Result Http.Error Klokotalo.Klokovi)
 
 
 randomBrojevi : Generator (List ( Int, Int ))
@@ -73,13 +73,18 @@ randomBrojevi =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        PrvoKlokotalo ( Ok klokovi) -> 
-            { model | klokotalo = { klokovi = klokovi
-                                    , operacija = Klokotalo.Sabiranje
-                                    , rezultat = Nothing}
-                                    } ! []
-        PrvoKlokotalo ( Err e) ->
-            model ! []
+        PrvoKlokotalo gm ->
+            case gm of
+                Gql.StigoK sk ->
+                    case sk of
+                        Ok klokovi -> 
+                            { model | klokotalo = { klokovi = klokovi
+                                                    , operacija = Klokotalo.Mnozenje
+                                                    , rezultat = Just 666 }
+                                                    } ! []
+                        Err e ->
+                            Debug.log (toString e)
+                            model ! []
         UrlUpdate location ->
             let
                 route =
@@ -170,7 +175,8 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.batch [ AnimationFrame.diffs Animate ]
+    Sub.none
+    -- Sub.batch [ AnimationFrame.diffs Animate ]
 
 
 view : Model -> Html Msg

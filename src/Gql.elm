@@ -64,10 +64,11 @@ decodeKlokotalo =
                 ( Json.Decode.field "klokovi" 
                     ( Json.Decode.field "edges" 
                         ( Json.Decode.list 
-                            (Json.Decode.map2 Klok.Klok
+                            ( Json.Decode.field "node"
+                            ( Json.Decode.map2 Klok.Klok
                                 ( Json.Decode.field "id" Json.Decode.string)
                                 ( Json.Decode.field "vrednost" Json.Decode.int)
-                            )  ) ) ) ) )
+                            ) ) ) ) ) ) )
 
 
 
@@ -79,6 +80,6 @@ uzmiKlokotaloRq =
                 (Http.jsonBody payload)
                 decodeKlokotalo
     in
-        Http.send StigoK post
+        Http.send (\a -> StigoK a) post
 
 
