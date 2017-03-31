@@ -6,6 +6,7 @@ import AnimationFrame
 import Time exposing (Time)
 import Random exposing (pair, list, int, generate, Generator)
 import Dugme exposing (Dugme)
+import Http
 import Color
 import Forma
 import Klok
@@ -47,16 +48,13 @@ init location =
                 GejmOfLajf.init
                     []
           }
-        , generate RandomGen randomBrojevi
-        , uzmiKlokotaloRq PrvoKlokotalo Klokotalo.Klokovi
+        --, generate RandomGen randomBrojevi
+        , Cmd.map (\_ -> AMsg) uzmiKlokotaloRq
         )
 
-callAll =
-    
 
 type Msg
     = AMsg
-    | Init
     | Dugmici Int Dugme.Msg
     | NasaForma Forma.Msg
     | Klok Klok.Msg
@@ -64,7 +62,7 @@ type Msg
     | UrlUpdate Navigation.Location
     | Animate Time
     | RandomGen (List ( Int, Int ))
-    | PrvoKlokotalo (Gql.Msg Klokotalo.Klokovi)
+    | PrvoKlokotalo (Result Http.Error Klokotalo.Klokovi)
 
 
 randomBrojevi : Generator (List ( Int, Int ))
@@ -75,8 +73,13 @@ randomBrojevi =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        PrvoKlokotalo klokovi -> 
-            { model | klokovi = klokovi} ! []
+        PrvoKlokotalo ( Ok klokovi) -> 
+            { model | klokotalo = { klokovi = klokovi
+                                    , operacija = Klokotalo.Sabiranje
+                                    , rezultat = Nothing}
+                                    } ! []
+        PrvoKlokotalo ( Err e) ->
+            model ! []
         UrlUpdate location ->
             let
                 route =

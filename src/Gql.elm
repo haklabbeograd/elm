@@ -4,18 +4,18 @@ import Http
 import Klokotalo
 import Klok
 import Json.Decode
+import Json.Encode
 
 
 
 type Msg
-    = StigkoK Klokotalo.Klokovi
-    | Stagod
+    = StigoK (Result Http.Error Klokotalo.Klokovi)
 
 q : String
 q =
     """
-{"query":"
-    query getKlokotalo($id: ID!) {
+'{"query":"
+    query GetKlokotalo($id: ID!) {
         getKlokotalo(id: $id) {
             id,
             klokovi {
@@ -30,10 +30,30 @@ q =
     }",
     "variables": "{
         "id": "S2xvazo0" 
-    }",
-    "operationName": "getKlokotalo"
-}
+    }"
+}'
 """
+
+payload =
+    Json.Encode.object
+        [ ("query", Json.Encode.string """
+                query GetKlokotalo($id: ID!) {
+                    getKlokotalo(id: $id) {
+                        id,
+                        klokovi {
+                        edges {
+                            node {
+                            id,
+                            vrednost
+                            }
+                        }
+                        }
+                    }
+                }""")
+        , ("variables", Json.Encode.string """{
+                "id": "S2xvazo0" 
+            }""")
+        ]
 
 
 decodeKlokotalo : Json.Decode.Decoder Klokotalo.Klokovi
@@ -50,24 +70,15 @@ decodeKlokotalo =
                             )  ) ) ) ) )
 
 
--- post : String -> Http.Body -> Http.Request Msg
--- post url body =
---     Http.request
---         { method = "POST"
---         , headers = []
---         , url = url
---         , body = body
---         , expect = Http.expectStringResponse (\_ -> Ok ())
---         , timeout = Nothing
---         , withCredentials = False
---         } 
 
-
-
-uzmiKlokotaloRq : Http.Request Klokotalo.Klokovi
+uzmiKlokotaloRq : Cmd Msg
 uzmiKlokotaloRq =
-    Http.post "https://eu-west-1.api.scaphold.io/graphql/ffelm"
-        (Http.stringBody "application/json" q)
-        decodeKlokotalo
+    let
+        post =
+            Http.post "https://eu-west-1.api.scaphold.io/graphql/ffelm"
+                (Http.jsonBody payload)
+                decodeKlokotalo
+    in
+        Http.send StigoK post
 
-        
+
